@@ -1,0 +1,28 @@
+{
+  "name": "cardboard",
+  "version": "1.0.0",
+  "description": "Flexible kanban meets agenda component for Vue.",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack --config ./webpack.config.dev.js",
+    "watch": "webpack --watch --config ./webpack.config.dev.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash.merge": "^4.6.1",
+    "moment": "^2.23.0",
+    "vue": "^2.5.17"
+  },
+  "devDependencies": {
+    "css-loader": "^1.0.1",
+    "sass": "^1.25.0",
+    "sass-loader": "^7.3.1",
+    "style-loader": "^0.23.1",
+    "vue-loader": "^15.4.2",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.1.2"
+  }
+}
