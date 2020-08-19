@@ -17,11 +17,15 @@
             </div>
             <div class="data-layout" :style="dataLayoutStyles">
                 <slot name="data-layout-start" />
-                <div v-for="(row, i) in rows" :index="i" class="row" :style="rowCss">
-                    <div v-if="cell && !cell._silent" v-for="(cell, c) in row" class="col" :style="'grid-column-start:'+ (c + 1) +'; grid-column-end: '+ ((cell._span ? cell._span : 1) + c + 1) +';'">
-                        <component :is="config.components.cells.body" :data="cell"></component>
-                    </div>
-                </div>
+                <component
+                    :is="config.components.row"
+                    v-for="(row, i) in rows" 
+                    :index="i" 
+                    class="row" 
+                    :style="rowCss"
+                    :columns="row"  
+                    :config="config"
+                />
                 <slot name="data-layout-end" />
             </div>
         </div>
@@ -34,6 +38,7 @@
     import CardBoardHeaderCell from './CardBoardHeaderCell.vue'
     import CardBoardGrid from './CardBoardGrid.vue'
     import GeneratesColumnCss from './GeneratesColumnCss.js'
+    import CardBoardRow from './CardBoardRow.vue'
 
     export default {
         mixins: [GeneratesColumnCss],
@@ -115,6 +120,7 @@
                     containerClassName: 'card-board-container',
                     components:{
                         grid: CardBoardGrid,
+                        row: CardBoardRow,
                         cells: {
                             body: CardBoardBodyCell,
                             header: CardBoardHeaderCell,
