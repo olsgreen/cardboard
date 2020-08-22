@@ -47,27 +47,6 @@
                 </div>
             </div>
         </div>
-
-        <!--
-        <card-board @header-cell-click="e => $emit('header-cell-click', e)" :columns="days" :data="cardBoardData" :options="config">
-            <component 
-                :is="headerComponent"
-                v-if="showHeader"
-                slot="layout-header"
-                :from="from" 
-                :to="to" 
-                :is-loading="isLoading"
-                @next="next"
-                @previous="previous"
-            >
-                <div slot="left"><slot name="header-left" v-bind:isLoading="isLoading"></slot></div>
-                <div slot="right"><slot name="header-right" v-bind:isLoading="isLoading"></slot></div>
-            </component>
-            <div slot="data-layout-end">
-                <slot name="data-layout-end" v-bind:isLoading="isLoading" v-bind:hasResults="hasResults"></slot>
-            </div>
-        </card-board>
-        !-->
     </div>
 </template>
 
