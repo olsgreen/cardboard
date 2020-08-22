@@ -58,22 +58,10 @@
     export default {
         mixins: [GeneratesColumnCss],
         props: {
-            showDate: {
+            initialDate: {
                 default() {
                     return Moment().startOf('isoWeek')
                 }
-            },
-            daysToShow: {
-                type: Number,
-                default: 7
-            },
-            daysToScroll: {
-                type: Number,
-                default: 7
-            },
-            showHeader: {
-                type: Boolean,
-                default: true
             },
             dataProvider: {
                 required: true,
@@ -87,7 +75,7 @@
             }
         },
         created() {
-            this.from = this.showDate
+            this.from = this.initialDate
 
             this.getData()
         },
@@ -113,7 +101,7 @@
                 var h = this.$el.querySelector('.card-board-header');
                 var stuck = false;
                 var stickPoint = getDistance();
-                var offsetTop = (this.config.stickyHeader && this.config.stickyHeader.offsetTop) ?
+                var offsetTop = (this.config.stickyHeader.offsetTop) ?
                     this.config.stickyHeader.offsetTop :
                     0;
 
@@ -122,6 +110,10 @@
                 }
 
                 window.onscroll = (e) => {
+                    if (!this.config.stickyHeader.enabled) {
+                        return
+                    }
+
                     var offset = (window.pageYOffset - offsetTop);
                     var distance = getDistance() - offset;
                     if ( (distance <= 0) && !stuck) {
@@ -142,10 +134,10 @@
                 }
             },
             next() {
-                this.gotoDate(new Moment(this.from).add(this.daysToScroll, 'days'))
+                this.gotoDate(new Moment(this.from).add(this.config.daysToScroll, 'days'))
             },
             previous() {
-                this.gotoDate(new Moment(this.from).subtract(this.daysToScroll, 'days'))
+                this.gotoDate(new Moment(this.from).subtract(this.config.daysToScroll, 'days'))
             },
             gotoDate(date) {
                 let oldDate = this.from;
@@ -295,13 +287,13 @@
                 return this.data.length > 0
             },
             to() {
-                return new Moment(this.from).add(this.daysToShow, 'days');
+                return new Moment(this.from).add(this.config.daysToShow, 'days');
             },
             columns() {
                 let columns = [];
                 let day = new Moment(this.from);
 
-                for (let i = 0; i < this.daysToShow; i++) {
+                for (let i = 0; i < this.config.daysToShow; i++) {
                     let date = new Moment(day)
 
                     columns.push({
@@ -318,6 +310,12 @@
             config() {
                 return merge({
                     containerClassName: 'card-board-container',
+                    daysToShow: 7,
+                    daysToScroll: 7,
+                    stickyHeader: {
+                        enabled: true,
+                        offsetTop: 0
+                    },
                     components:{
                         header: Header,
                         grid: Grid,
