@@ -20,7 +20,7 @@
                 <component
                     :is="config.components.row"
                     v-for="(row, i) in rows" 
-                    :index="i" 
+                    :key="i" 
                     class="row" 
                     :style="rowCss"
                     :columns="row"  
@@ -132,7 +132,7 @@
                     spanComputer(item) {
                         return item.span ? item.span : 1
                     },
-                    spanComparator(a, b) {
+                    sortComparator(a, b) {
                         a = a._span ? a._span : 1
                         b = b._span ? b._span : 1
 
@@ -146,12 +146,9 @@
             rows() {
                 let rows = [];
 
-                let sorted  = this.data.map(item => {
-                    item._span = this.config.spanComputer.apply(this, [item]);
-                    item._column = this.config.columnComputer.apply(this, [item]);
-                    return item
-                }).sort(this.config.spanComparator);
-
+                // The create row helper simply creates an array with n number 
+                // of null indexes, where n equals the number of columns are 
+                // being displaid to the user.
                 const createRow = () => {
                     let row = []
 
@@ -164,54 +161,76 @@
                     return rows.length - 1;
                 }
 
-                const findRowIndexFor = (item) => {
-                    let requiredColumnIndexes = [];
+                // The row finder helper method will return the next available 
+                // row index for an entry or false if one is not available. It iterativly 
+                // searches the current row set looking for space in a row at the entries 
+                // designated column index.
+                const findOrCreateRowIndexFor = (item) => {
+                    let requiredColumnIndexes = []
+                    let sComp = this.config.spanComputer.bind(this)
+                    let cComp = this.config.columnComputer.bind(this)
 
-                    for (
-                        let i = this.config.columnComputer.apply(this, [item]); 
-                        i < (this.config.columnComputer.apply(this, [item]) + this.config.spanComputer.apply(this, [item])); 
-                        i++
-                    ) {
+                    // First, we work out the column indexes that the given entry requires, 
+                    // e.g. an entry designated to column 2 with a span of 3 will require 
+                    // row indexes 2, 3 and 4.
+                    for (let i = cComp(item); i < (cComp(item) + sComp(item)); i++) {
                         requiredColumnIndexes.push(i);
                     }
 
+                    // Next we iterate over each row in the current collection to check 
+                    // whether it can accomodate the entry.
                     for (let i in rows) {
+                        // Check each of the columns in the row that the item will occupy.
                         for (let c in requiredColumnIndexes) {
-
+                            // If the required index is not empty break the loop 
+                            // to move on to the next row.
                             if (rows[i][requiredColumnIndexes[c]] !== null) {
                                 break;
                             }
 
+                            // If we are on the last required column index we return the 
+                            // current row index as we now know the item can be accomodated.
                             if ((requiredColumnIndexes.length - 1) === parseInt(c)) {
                                 return i;
                             }
                         }
                     }
 
-                    return false;
+                    return createRow();
                 }
 
+                // First, we add properties to the entries for which columns
+                // they should start in and how many columns they should take up.
+                let sorted  = this.data.map(item => {
+                    item._span = this.config.spanComputer.apply(this, [item]);
+                    item._column = this.config.columnComputer.apply(this, [item]);
+                    return item
+                })
+
+                // Then we sort the items via the configured sort comparator. By 
+                // default entries that require more space / columns are placed 
+                // lower in the sorted entries thus placing them in lower rows 
+                // as they are assigned last.
+                .sort(this.config.sortComparator);
+
+                // Next we iterate over each entry and place it within its rows column collection.
                 for (let k in sorted) {
-                    let rowIndex = findRowIndexFor(sorted[k]);
+                    let rowIndex = findOrCreateRowIndexFor(sorted[k]);
 
-                    if (!rowIndex) {
-                       rowIndex = createRow();
-                    }
-
-                    if (!sorted[k]._span) {
-                        sorted[k]._span = 1;
-                    }
-
-                    for (let i = 0; i < sorted[k]._span; i++) {                        
+                    // We iterate over each column that the entry occupies.
+                    for (let i = 0; i < sorted[k]._span; i++) {           
+                        // We add the item to each column it occupies.
                         rows[rowIndex][sorted[k]._column + i] = Object.assign({}, sorted[k]);
-                        
-                        if (i > 0) {
-                            rows[rowIndex][sorted[k]._column + i]._silent = true
+
+                        if (i > 0) {   
+                            // If this is not the first column the item occupies, we 
+                            // mark the item as a placeholder.                     
+                            rows[rowIndex][sorted[k]._column + i]._placeholder = true
                         }
                     }
                 }
 
-                return rows;
+                return rows
             }
         }
     }
