@@ -17,50 +17,42 @@
         },
         data() {
             return {
-                data: [
-                    {
-                        content: 'Event One',
-                        from: new Moment('2018-12-10'),
-                        to: new Moment('2018-12-10')
-                    },{
-                        content: 'Event Two',
-                        from: new Moment('2018-12-10'),
-                        to: new Moment('2018-12-14')
-                    },{
-                        content: 'Event Three',
-                        from: new Moment('2018-12-15'),
-                        to: new Moment('2018-12-18')
-                    },{
-                        content: 'Event Four',
-                        from: new Moment('2018-12-14'),
-                        to: new Moment('2018-12-15')
-                    },{
-                        content: 'Event Five',
-                        from: new Moment('2018-12-18'),
-                        to: new Moment('2018-12-19')
-                    },{
-                        content: 'Event Six',
-                        from: new Moment('2018-12-21'),
-                        to: new Moment('2018-12-22')
-                    },{
-                        content: 'Christmas',
-                        from: new Moment('2018-12-25'),
-                        to: new Moment('2018-12-25'),
-                        color: 'red'
-                    },{
-                        content: 'Event Seven',
-                        from: new Moment('2018-12-10'),
-                        to: new Moment('2018-12-11')
-                    },{
-                        content: 'Event Eight',
-                        from: new Moment('2018-12-11'),
-                        to: new Moment('2018-12-14')
-                    },{
-                        content: 'Event Nine',
-                        from: new Moment('2018-12-13'),
-                        to: new Moment('2018-12-16')
-                    },
-                ]
+                //
+            }
+        },
+        computed: {
+            data() {
+                let entries = []
+                let seed1, seed2, from, to;
+
+                for (let i = 0; i < 35; i++) {
+                    seed1 = _.random(-14, 14)
+                    seed2 = _.random(0,3)
+
+                    if (seed1 < 0) {
+                        from = Moment().subtract(Math.abs(seed1), 'days')
+                    } else if (seed1 > 0) {
+                        from = Moment().add(seed1, 'days')
+                    }
+
+                    if (seed2 > 0) {
+                        to = from.clone().add(seed2, 'days')
+                    } else {
+                        to = from.clone();
+                    }
+
+                    from = from.hour(0).minute(0).seconds(0)
+                    to = to.hour(23).minute(59).seconds(59)
+
+
+                    entries.push({
+                        content: 'Event ' + (i + 1),
+                        from,
+                        to
+                    })
+                }
+
+                return entries
             }
         }
     }
