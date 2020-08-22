@@ -1,12 +1,12 @@
 <template>
     <div style="height: 100%;">
-        <card-board-scheduler :data-provider="dataProvider"></card-board-scheduler>
+        <scheduler :data-provider="dataProvider"></scheduler>
     </div>
 </template>
 
 <script>
     import Moment from 'moment';
-    import { CardBoardScheduler } from '../src/index.js'
+    import Scheduler from '../src/index.js'
 
     const coolors = [
         '#f94144',
@@ -22,7 +22,7 @@
     ]
 
     export default {
-        components: { CardBoardScheduler },
+        components: { Scheduler },
         methods: {
             dataProvider(from, to) {
                 return this.data;

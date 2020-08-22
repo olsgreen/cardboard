@@ -4,10 +4,9 @@
             <div class="card-board-inner">
                 <div class="grid-layout">
                     <div class="card-board-header" style="position: absolute; top:0; left: 0; right: 0; z-index: 2;">
-                        <slot name="layout-header">
+                        <slot name="layout-header" v-if="config.components.header">
                             <component 
-                                :is="headerComponent"
-                                v-if="showHeader"
+                                :is="config.components.header"
                                 :from="from" 
                                 :to="to" 
                                 :is-loading="isLoading"
@@ -74,17 +73,11 @@
 
 <script>
     import { merge } from 'lodash'
-    import SchedulerHeader from './CardBoardSchedulerHeader.vue'
-    import CardBoardRow from './CardBoardRow.vue'
-    import CardBoardSchedulerHeaderCell from './CardBoardSchedulerHeaderCell.vue'
-    import CardBoardSchedulerGrid from './CardBoardSchedulerGrid.vue'
-    import GeneratesColumnCss from './GeneratesColumnCss.js'
-    import CardBoardBodyCell from './CardBoardBodyCell.vue'
+    import { GeneratesColumnCss, Grid, Header, ColumnHeader, Row, Item } from './subcomponents.js'
     import Moment from 'moment'
 
     export default {
         mixins: [GeneratesColumnCss],
-        components: { SchedulerHeader },
         props: {
             showDate: {
                 default() {
@@ -98,12 +91,6 @@
             daysToScroll: {
                 type: Number,
                 default: 7
-            },
-            headerComponent: {
-                type: Object,
-                default() {
-                    return SchedulerHeader
-                }
             },
             showHeader: {
                 type: Boolean,
@@ -353,11 +340,12 @@
                 return merge({
                     containerClassName: 'card-board-container',
                     components:{
-                        grid: CardBoardSchedulerGrid,
-                        row: CardBoardRow,
+                        header: Header,
+                        grid: Grid,
+                        row: Row,
                         cells: {
-                            body: CardBoardBodyCell,
-                            header: CardBoardSchedulerHeaderCell,
+                            body: Item,
+                            header: ColumnHeader,
                         }
                     },
                     columnComputer(item) {
