@@ -1,12 +1,12 @@
 <template>
     <div style="height: 100%;">
-        <scheduler :data-provider="dataProvider"></scheduler>
+        <scheduler :data-provider="dataProvider" :options="config"></scheduler>
     </div>
 </template>
 
 <script>
     import Moment from 'moment';
-    import Scheduler from '../src/index.js'
+    import { Scheduler, MasonryRowFormatter } from '../src/index.js'
 
     const coolors = [
         '#f94144',
@@ -30,7 +30,9 @@
         },
         data() {
             return {
-                //
+                config: {
+                    rowFormatter: MasonryRowFormatter
+                }
             }
         },
         computed: {

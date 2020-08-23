@@ -52,7 +52,7 @@
 
 <script>
     import { merge } from 'lodash'
-    import { GeneratesColumnCss, Grid, Header, ColumnHeader, Row, Item } from './subcomponents.js'
+    import { GeneratesColumnCss, DefaultConfig } from './index.js'
     import Moment from 'moment'
 
     export default {
@@ -81,6 +81,7 @@
         },
         mounted() {
             this.detectAndSetHeaderHeight()
+
             this.stickyHeader()
         },
         data() {
@@ -188,100 +189,9 @@
                 return this.config.containerClassName + (this.hasRows ? ' has-rows' : ' is-empty')
             },
             rows() {
-                let rows = [];
+                let formatter = new this.config.rowFormatter(this)
 
-                // The create row helper simply creates an array with n number 
-                // of null indexes, where n equals the number of columns are 
-                // being displaid to the user.
-                const createRow = () => {
-                    let row = []
-
-                    for (let i in this.columns) {
-                        row.push(null)
-                    }
-
-                    rows.push(row);
-
-                    return rows.length - 1;
-                }
-
-                // The row finder helper method will return the next available 
-                // row index for an entry or false if one is not available. It iterativly 
-                // searches the current row set looking for space in a row at the entries 
-                // designated column index.
-                const findOrCreateRowIndexFor = (item) => {
-                    let requiredColumnIndexes = []
-                    let sComp = this.config.spanComputer.bind(this)
-                    let cComp = this.config.columnComputer.bind(this)
-
-                    // First, we work out the column indexes that the given entry requires, 
-                    // e.g. an entry designated to column 2 with a span of 3 will require 
-                    // row indexes 2, 3 and 4.
-                    for (let i = cComp(item); i < (cComp(item) + sComp(item)); i++) {
-                        requiredColumnIndexes.push(i);
-                    }
-
-                    // Next we iterate over each row in the current collection to check 
-                    // whether it can accomodate the entry.
-                    for (let i in rows) {
-                        // Check each of the columns in the row that the item will occupy.
-                        for (let c in requiredColumnIndexes) {
-                            // If the required index is not empty break the loop 
-                            // to move on to the next row.
-                            if (rows[i][requiredColumnIndexes[c]] !== null) {
-                                break;
-                            }
-
-                            // If we are on the last required column index we return the 
-                            // current row index as we now know the item can be accomodated.
-                            if ((requiredColumnIndexes.length - 1) === parseInt(c)) {
-                                return i;
-                            }
-                        }
-                    }
-
-                    return createRow();
-                }
-
-                // First, we add properties to the entries for which columns
-                // they should start in and how many columns they should take up.
-                let sorted  = this.data.map(item => {
-                    item._from = new Moment(item.from)
-                    item._to = new Moment(item.to)
-
-                    if (item._from.isBefore(this.from) && item._to.isAfter(this.from)) {
-                        item._from = new Moment(this.from)
-                    }
-
-                    item._span = this.config.spanComputer.apply(this, [item]);
-                    item._column = this.config.columnComputer.apply(this, [item]);
-                    return item
-                })
-
-                // Then we sort the items via the configured sort comparator. By 
-                // default entries that require more space / columns are placed 
-                // lower in the sorted entries thus placing them in lower rows 
-                // as they are assigned last.
-                .sort(this.config.sortComparator);
-
-                // Next we iterate over each entry and place it within its rows column collection.
-                for (let k in sorted) {
-                    let rowIndex = findOrCreateRowIndexFor(sorted[k]);
-
-                    // We iterate over each column that the entry occupies.
-                    for (let i = 0; i < sorted[k]._span; i++) {           
-                        // We add the item to each column it occupies.
-                        rows[rowIndex][sorted[k]._column + i] = Object.assign({}, sorted[k]);
-
-                        if (i > 0) {   
-                            // If this is not the first column the item occupies, we 
-                            // mark the item as a placeholder.                     
-                            rows[rowIndex][sorted[k]._column + i]._placeholder = true
-                        }
-                    }
-                }
-
-                return rows
+                return formatter.format(this.data)
             },
             hasResults() {
                 return this.data.length > 0
@@ -308,49 +218,7 @@
                 return columns
             },
             config() {
-                return merge({
-                    containerClassName: 'card-board-container',
-                    daysToShow: 7,
-                    daysToScroll: 7,
-                    stickyHeader: {
-                        enabled: true,
-                        offsetTop: 0
-                    },
-                    components:{
-                        header: Header,
-                        grid: Grid,
-                        row: Row,
-                        cells: {
-                            body: Item,
-                            header: ColumnHeader,
-                        }
-                    },
-                    columnComputer(item) {
-                        for (let i in this.columns) {
-                            if (item._from.isBetween(this.columns[i].start, this.columns[i].end, null, '[]')) {
-                                return parseInt(i)
-                            }
-
-                            if (item._to.isBetween(this.columns[i].start, this.columns[i].end, null, '[]')) {
-                                return 0
-                            }
-                        }
-                    },
-                    spanComputer(item) {
-                        let from = item._from.startOf('day');
-                        let to = item._to.endOf('day');
-                        return Math.max(1, Math.ceil(to.diff(from, 'days', true)));
-                    },
-                    sortComparator(a, b) {
-                        a = a._span ? a._span : 1
-                        b = b._span ? b._span : 1
-
-                        if (a > b) return 1;
-                        if (a < b) return -1;
-
-                        return 0;
-                    }
-                }, this.options);
+                return merge(DefaultConfig, this.options);
             }
         }
     }
