@@ -2,21 +2,23 @@
     <div class="card-board-scheduler-container">
         <div :class="containerClasses">
             <div class="card-board-inner">
-                <div class="grid-layout">
-                    <div class="card-board-header" style="position: absolute; top:0; left: 0; right: 0; z-index: 2;">
-                        <slot name="layout-header" v-if="config.components.header">
-                            <component 
-                                :is="config.components.header"
-                                :from="from" 
-                                :to="to" 
-                                :is-loading="isLoading"
-                                @next="next"
-                                @previous="previous"
-                            >
-                                <div slot="left"><slot name="header-left" v-bind:isLoading="isLoading"></slot></div>
-                                <div slot="right"><slot name="header-right" v-bind:isLoading="isLoading"></slot></div>
-                            </component>
-                        </slot>
+                <div class="card-board-layout-header">
+                    <slot name="layout-header" v-if="config.components.header">
+                        <component 
+                            :is="config.components.header"
+                            :from="from" 
+                            :to="to" 
+                            :is-loading="isLoading"
+                            @next="next"
+                            @previous="previous"
+                        >
+                            <div slot="left"><slot name="header-left" v-bind:isLoading="isLoading"></slot></div>
+                            <div slot="right"><slot name="header-right" v-bind:isLoading="isLoading"></slot></div>
+                        </component>
+                    </slot>
+                </div>
+                <div class="grid-layout" :style="gridLayoutStyles">
+                    <div class="card-board-cell-headers" style="position: absolute; top:0; left: 0; right: 0; z-index: 2;">
                         <div v-if="config.components.cells.header" class="card-board-column-headers row" :style="rowCss">
                             <div v-for="(column, index) in columns" :index="index" class="col">
                                 <component :is="config.components.cells.header" :data="column"></component>
@@ -80,7 +82,7 @@
             this.getData()
         },
         mounted() {
-            this.detectAndSetHeaderHeight()
+            this.detectAndSetHeaderHeights()
 
             this.stickyHeader()
         },
@@ -89,17 +91,19 @@
                 data: [],
                 from: null,
                 isLoading: true,
-                headerHeight: 0,
+                cellHeaderHeight: 0,
+                layoutHeaderHeight: 0,
             }
         },
         methods: {
-            detectAndSetHeaderHeight() {
+            detectAndSetHeaderHeights() {
                 if (this.$el) {
-                   this.headerHeight = this.$el.querySelector('.card-board-header').clientHeight
+                   this.cellHeaderHeight = this.$el.querySelector('.card-board-cell-headers').clientHeight
+                   this.layoutHeaderHeight = this.$el.querySelector('.card-board-layout-header').clientHeight
                 }
             },
             stickyHeader() {
-                var h = this.$el.querySelector('.card-board-header');
+                var h = this.$el.querySelector('.card-board-cell-headers');
                 var stuck = false;
                 var stickPoint = getDistance();
                 var offsetTop = (this.config.stickyHeader.offsetTop) ?
@@ -183,7 +187,10 @@
                 return this.rows.length > 0
             },
             dataLayoutStyles() {
-                return 'margin-top: ' + this.headerHeight + 'px;'
+                return 'margin-top: ' + this.cellHeaderHeight + 'px;'
+            },
+            gridLayoutStyles() {
+                return 'margin-top: ' + this.layoutHeaderHeight + 'px;'
             },
             containerClasses() {
                 return this.config.containerClassName + (this.hasRows ? ' has-rows' : ' is-empty')
@@ -234,7 +241,7 @@
             overflow: hidden;
         }
 
-        .card-board-header {
+        .card-board-cell-headers {
             background: rgba(255,255,255,0.95);
         }
     
