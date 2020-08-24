@@ -1,6 +1,7 @@
 import { StandardRowFormatter, Header, Grid, Row, Item, ColumnHeader } from './index.js'
 
 let DefaultConfig = {
+    debug: false,
     containerClassName: 'card-board-container',
     daysToShow: 7,
     daysToScroll: 7,

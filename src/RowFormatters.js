@@ -66,6 +66,11 @@ class StandardRowFormatter
             return item
         })
 
+       // Remove items that have no column set, this is usually because the 
+       // item is not within the date range that we are currently processing 
+       // data for.
+       .filter(i => i._column)
+
         // Then we sort the items via the configured sort comparator. By 
         // default entries that require more space / columns are placed 
         // lower in the sorted entries thus placing them in lower rows 
@@ -151,6 +156,10 @@ class MasonryRowFormatter extends StandardRowFormatter
             for (let i = 0; i < sorted[k]._span; i++) {           
                 // We add the item to each column it occupies.
                 this.rows[rowIndex][sorted[k]._column + i] = Object.assign({}, sorted[k]);
+
+                if (this.scheduler.config.debug) {
+                    console.debug(sorted[k].content + ' | Row: ' + rowIndex + ' | Col: ' + (sorted[k]._column + i))
+                }
 
                 if (i > 0) {   
                     // If this is not the first column the item occupies, we 
