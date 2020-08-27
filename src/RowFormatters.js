@@ -50,6 +50,16 @@ class StandardRowFormatter
         return 0;
     }
 
+    createRow() {
+        let row = []
+
+        for (let i in this.scheduler.columns) {
+            row.push(null)
+        }
+
+        return row
+    }
+
     prepare(data) {
         // First, we add properties to the entries for which columns
         // they should start in and how many columns they should take up.
@@ -57,8 +67,8 @@ class StandardRowFormatter
             item._from = new Moment(item.from)
             item._to = new Moment(item.to)
 
-            if (item._from.isBefore(this.from) && item._to.isAfter(this.from)) {
-                item._from = new Moment(this.from)
+            if (item._from.isBefore(this.scheduler.from) && item._to.isAfter(this.scheduler.from)) {
+                item._from = new Moment(this.scheduler.from)
             }
 
             item._span = this.spanComputer(item);
@@ -69,7 +79,7 @@ class StandardRowFormatter
        // Remove items that have no column set, this is usually because the 
        // item is not within the date range that we are currently processing 
        // data for.
-       .filter(i => i._column)
+       .filter(i => typeof i._column !== 'undefined')
 
         // Then we sort the items via the configured sort comparator. By 
         // default entries that require more space / columns are placed 
@@ -79,7 +89,11 @@ class StandardRowFormatter
     }
 
     format(data) {
-        return this.prepare(data).map(i => [i]);
+        return this.prepare(data).map(i => {
+            let row = this.createRow()
+            row[i._column] = i
+            return row
+        });
     }
 }
 
@@ -96,11 +110,7 @@ class MasonryRowFormatter extends StandardRowFormatter
     // of null indexes, where n equals the number of columns are 
     // being displaid to the user.
     createRow() {
-        let row = []
-
-        for (let i in this.scheduler.columns) {
-            row.push(null)
-        }
+        let row = super.createRow()
 
         this.rows.push(row);
 

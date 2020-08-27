@@ -1,24 +1,24 @@
 <template>
     <div class="card-board-scheduler-container">
         <div :class="containerClasses">
+            <div class="card-board-layout-header">
+                <slot name="layout-header" v-if="config.components.header">
+                    <component 
+                        :is="config.components.header"
+                        :from="from" 
+                        :to="to" 
+                        :is-loading="isLoading"
+                        @next="next"
+                        @previous="previous"
+                    >
+                        <div slot="left"><slot name="header-left" v-bind:isLoading="isLoading"></slot></div>
+                        <div slot="right"><slot name="header-right" v-bind:isLoading="isLoading"></slot></div>
+                    </component>
+                </slot>
+            </div>
             <div class="card-board-inner">
-                <div class="card-board-layout-header">
-                    <slot name="layout-header" v-if="config.components.header">
-                        <component 
-                            :is="config.components.header"
-                            :from="from" 
-                            :to="to" 
-                            :is-loading="isLoading"
-                            @next="next"
-                            @previous="previous"
-                        >
-                            <div slot="left"><slot name="header-left" v-bind:isLoading="isLoading"></slot></div>
-                            <div slot="right"><slot name="header-right" v-bind:isLoading="isLoading"></slot></div>
-                        </component>
-                    </slot>
-                </div>
                 <div class="grid-layout" :style="gridLayoutStyles">
-                    <div class="card-board-cell-headers" style="position: absolute; top:0; left: 0; right: 0; z-index: 2;">
+                    <div class="col card-board-cell-header" :style="cellHeaderStyles">
                         <div v-if="config.components.cells.header" class="card-board-column-headers row" :style="rowCss">
                             <div v-for="(column, index) in columns" :index="index" class="col">
                                 <component :is="config.components.cells.header" :data="column"></component>
@@ -28,6 +28,7 @@
                     <component 
                         :is="config.components.grid" 
                         :columns="columns"
+                        :config="config"
                     ></component>
                 </div>
                 <div class="data-layout" :style="dataLayoutStyles">
@@ -98,44 +99,33 @@
         methods: {
             detectAndSetHeaderHeights() {
                 if (this.$el) {
-                   this.cellHeaderHeight = this.$el.querySelector('.card-board-cell-headers').clientHeight
+                   this.cellHeaderHeight = this.$el.querySelector('.card-board-cell-header').clientHeight
                    this.layoutHeaderHeight = this.$el.querySelector('.card-board-layout-header').clientHeight
                 }
             },
             stickyHeader() {
-                var h = this.$el.querySelector('.card-board-cell-headers');
-                var stuck = false;
-                var stickPoint = getDistance();
+                var layoutHeader = this.$el.querySelector('.card-board-layout-header');
+                var cellHeader = this.$el.querySelector('.card-board-cell-header');
                 var offsetTop = (this.config.stickyHeader.offsetTop) ?
                     this.config.stickyHeader.offsetTop :
                     0;
 
-                function getDistance() {
-                    return h.offsetTop;
-                }
+                this.$el.onscroll = (e) => {
+                    window.requestAnimationFrame(() => {
+                        layoutHeader.style.left = this.$el.scrollLeft + 'px';
 
-                window.onscroll = (e) => {
-                    if (!this.config.stickyHeader.enabled) {
-                        return
-                    }
+                        if (!this.config.stickyHeader.enabled) {
+                            return
+                        }
 
-                    var offset = (window.pageYOffset - offsetTop);
-                    var distance = getDistance() - offset;
-                    if ( (distance <= 0) && !stuck) {
-                        h.style.position = 'fixed';
-                        h.style.top = offsetTop  > 0 ?
-                        offsetTop + 'px' : 
-                        this.$el.getBoundingClientRect().top + 'px';
-                        h.style.left = this.$el.getBoundingClientRect().left + 'px';
-                        h.style.width = this.$el.getBoundingClientRect().width + 'px';
-                        stuck = true;
-                    } else if (stuck && (offset <= stickPoint)){
-                        h.style.position = 'absolute';
-                        h.style.top = '0px';
-                        h.style.left = '0px';
-                        h.style.width = 'auto';
-                        stuck = false;
-                    }
+                        cellHeader.style.top = offsetTop  > 0 ?
+                                offsetTop + 'px' : 
+                                (this.$el.scrollTop - 1) + 'px';
+                        
+                        layoutHeader.style.top = offsetTop  > 0 ?
+                                offsetTop + 'px' : 
+                                this.$el.scrollTop + 'px';
+                    })
                 }
             },
             next() {
@@ -187,13 +177,18 @@
                 return this.rows.length > 0
             },
             dataLayoutStyles() {
-                return 'margin-top: ' + this.cellHeaderHeight + 'px;'
+                return 'padding-top: ' + (this.cellHeaderHeight + this.layoutHeaderHeight) + 'px;'
             },
             gridLayoutStyles() {
-                return 'margin-top: ' + this.layoutHeaderHeight + 'px;'
+                //return 'padding-top: ' + this.layoutHeaderHeight + 'px;'
+            },
+            cellHeaderStyles() {
+                return 'padding-top: ' + this.layoutHeaderHeight + 'px;'
             },
             containerClasses() {
-                return this.config.containerClassName + (this.hasRows ? ' has-rows' : ' is-empty')
+                return this.config.containerClassName + 
+                    (this.hasRows ? ' has-rows' : ' is-empty') +
+                    (this.config.stickyHeader.enabled ? ' has-sticky-header' : '')
             },
             rows() {
                 let formatter = new this.config.rowFormatter(this)
@@ -237,13 +232,15 @@
         position: relative;
         min-height: 100%; width: 100%;
 
-        .card-board-inner {
-            overflow: hidden;
+        .card-board-cell-header {
+            position: absolute; 
+            top:0; left: 0;
+            z-index: 2;
+            background: rgba(255,255,255,0.95);
+            min-width: 100%;
         }
 
-        .card-board-cell-headers {
-            background: rgba(255,255,255,0.95);
-        }
+        .card-board-inner { position: relative; min-height: 100%; }
     
         .row {
             display: grid;
@@ -255,8 +252,8 @@
 
         .grid-layout {
             position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%;
+            top: 0; left: 0; bottom: 0;
+            width: 100%; min-height: 100%;
 
             & > div > .row > .col {
                 border-bottom: 1px solid #e5e5e5;
@@ -264,6 +261,12 @@
         }
 
         &.is-empty .grid-layout > .row > .col { border-bottom: none; }
+
+        .card-board-layout-header {
+            position: absolute; 
+            width: 100%; z-index: 101;
+            background: rgba(255, 255, 255, 0.95);
+        }
 
         .data-layout {
             z-index: 1; 
@@ -275,9 +278,11 @@
     .card-board-scheduler-container {
 
         font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
-        min-height: 100%;
         display: flex;
         flex-direction: column;
+        background: #fff;
+        overflow: auto;
+        position: relative;
 
         & > div { flex: 1; }
 

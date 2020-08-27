@@ -5,6 +5,7 @@ let DefaultConfig = {
     containerClassName: 'card-board-container',
     daysToShow: 7,
     daysToScroll: 7,
+    columnWidth: '1fr',
     stickyHeader: {
         enabled: true,
         offsetTop: 0

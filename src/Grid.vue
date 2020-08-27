@@ -20,7 +20,12 @@
         mixins: [GeneratesColumnCss,DateRelatedColumnClassNames],
         props: {
             columns: {
-                type: Array
+                type: Array,
+                required: true,
+            },
+            config: {
+                type: Object,
+                required: true,
             }
         }
     }
