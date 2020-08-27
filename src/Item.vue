@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="card-board-body-cell" :style="'background: '+(data.color ? data.color : '#999')+';'" v-if="data">
+        <div :class="classes" :style="'background: '+(data.color ? data.color : '#999')+';'" v-if="data">
             {{ data.content }} {{ data.index }} ({{ data.from | shortDate }} - {{ data.to | shortDate }})
         </div>
     </div>
@@ -15,15 +15,33 @@
         margin-right: 1rem; 
         overflow: hidden;
         word-wrap: break-word;
+
+        &.is-continuation { margin-left: 0; }
+        &.is-curtailed { margin-right: 0; }
     }
 </style>
 
 <script>
+    import Moment from 'moment'
+
     export default {
         props: ['data'],
         filters: {
             shortDate(v) {
                 return v.format('DD/MM')
+            }
+        },
+        computed: {
+            classes() {
+                let list = ['card-board-body-cell']
+
+                if (this.data._display_state === 'continuation') {
+                    list.push('is-continuation')
+                } else if (this.data._display_state === 'curtailed') {
+                    list.push('is-curtailed')
+                }
+                
+                return list
             }
         }
     }

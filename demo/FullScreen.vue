@@ -8,14 +8,14 @@
 
 <script>
     import { Scheduler, MasonryRowFormatter } from '../src/index.js'
-    import { FixedDataGenerator } from './DataGenerator.js'
+    import { FixedDataGenerator, RandomDataGenerator } from './DataGenerator.js'
 
     const config = {
         rowFormatter: MasonryRowFormatter
     }
 
     export default {
-        mixins: [FixedDataGenerator],
+        mixins: [RandomDataGenerator],
         components: { Scheduler },
         data() {
             return {
