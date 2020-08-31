@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="cell && !cell._placeholder" v-for="(cell, c) in columns" class="col" :style="'grid-column-start:'+ (c + 1) +'; grid-column-end: '+ ((cell._span ? cell._span : 1) + c + 1) +';'">
+        <div v-if="cell && !cell._placeholder" v-for="(cell, c) in columns" class="scheduler-col" :style="'grid-column-start:'+ (c + 1) +'; grid-column-end: '+ ((cell._span ? cell._span : 1) + c + 1) +';'">
             <component :is="config.components.cells.body" :data="cell"></component>
         </div>
     </div>

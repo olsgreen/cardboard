@@ -95,31 +95,37 @@ const GroupedDataGenerator = {
                 {
                     id: 1,
                     label: 'Jeanne-France',
+                    position: 'CEO',
                     image: 'assets/headshots/1.png',
                     entries: []
                 },{
                     id: 2,
                     label: 'Jean-Marie',
+                    position: 'CFO',
                     image: 'assets/headshots/2.png',
                     entries: []
                 },{
                     id: 3,
                     label: 'Oliver',
+                    position: 'CTO',
                     image: 'assets/headshots/4.png',
                     entries: []
                 },{
                     id: 4,
                     label: 'Laetitia',
+                    position: 'Creativity',
                     image: 'assets/headshots/3.png',
                     entries: []
                 },{
                     id: 5,
                     label: 'Cedric',
+                    position: 'Head Mechanic',
                     image: 'assets/headshots/6.png',
                     entries: []
                 },{
                     id: 6,
                     label: 'Vanessa',
+                    position: 'Head Chef',
                     image: 'assets/headshots/5.png',
                     entries: []
                 },

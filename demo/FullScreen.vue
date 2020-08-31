@@ -14,6 +14,10 @@
         rowFormatter: MasonryRowFormatter,
         columnWidth: '200px',
         daysToShow: 14,
+        gridLines: {
+            columns: false,
+            rows: false,
+        }
     }
 
     export default {

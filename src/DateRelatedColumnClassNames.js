@@ -3,17 +3,17 @@ import Moment from 'moment'
 export default {
     methods: {
         dateClassPrefixes(date) {
-            let str = '';
+            let classes = [];
 
             if (Moment().isBefore(date, 'day')) {
-                str += ' is-after'
+                classes.push('is-after')
             } else if (Moment().isAfter(date, 'day')) {
-                str += ' is-before'
+                classes.push('is-before')
             } else {
-                str += ' is-today'
+                classes.push('is-today')
             }
 
-            return str;
+            return classes;
         }
     }
 }

@@ -13,11 +13,12 @@
     const config = {
         rowFormatter: GroupedRowFormatter,
         //columnWidth: '250px',
-        dataSourceGroups: {
+        rowLabels: {
             enabled: true,
-            rowLabel: 'label',
-            rowKey: 'id',
-            headerLabel: 'Team Members',
+            columnLabel: 'Team Members',
+            keys: {
+                sublabel: 'position'
+            }
         },
     }
 

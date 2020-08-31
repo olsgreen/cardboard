@@ -1,76 +1,97 @@
 <template>
-    <div class="card-board-scheduler-container">
-        <div :class="containerClasses">
-            <div ref="layoutHeader" class="card-board-layout-header">
-                <slot name="layout-header" v-if="config.components.header">
-                    <component 
-                        :is="config.components.header"
-                        :from="from" 
-                        :to="to" 
-                        :is-loading="isLoading"
-                        @next="next"
-                        @previous="previous"
-                    >
-                        <div slot="left"><slot name="header-left" v-bind:isLoading="isLoading"></slot></div>
-                        <div slot="right"><slot name="header-right" v-bind:isLoading="isLoading"></slot></div>
-                    </component>
-                </slot>
-            </div>
-            <div style="display: flex;">
-                <div v-if="config.dataSourceGroups.enabled" style="flex: 0 0 225px;">
-                    <div ref="rowLabelHeaderPane" class="pane" style="box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);">
-                        <div :style="{ height: cellHeaderHeight + 'px', borderBottom: '3px solid #e5e5e5', borderRight: '3px solid #e5e5e5', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)', display: 'flex', alignItems: 'center'  }">
-                            <span style="color: #757575; font-weight: 500; padding: 0 1rem;">{{ config.dataSourceGroups.headerLabel }}</span>
-                        </div>
+    <div :class="containerClasses">
+        <header ref="layoutHeader" class="scheduler-layout-header">
+            <slot name="layout-header" v-if="config.components.header">
+                <component 
+                    :is="config.components.header"
+                    :from="from" 
+                    :to="to" 
+                    :is-loading="isLoading"
+                    @next="next"
+                    @previous="previous"
+                >
+                    <div slot="left">
+                        <slot name="header-left" v-bind:isLoading="isLoading"></slot>
                     </div>
-                    <div ref="rowLabelPane" class="pane" :style="{ overflow: 'hidden', height: dataPaneHeight + 'px', borderRight: '3px solid #e5e5e5', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)' }">
-                        <div class="card-board-row-label-column">
-                            <div v-for="row in data" :style="{ display: 'flex', alignItems: 'center', height: (config.rowHeight - 1) + 'px', borderBottom: '1px dashed #e5e5e5' }">
-                                    <img style="padding: .5rem; width: 48px; height: auto; border-radius: 50%;" :src="row.image" :alt="row.label" />
-                                    <span v-if="row">{{ row.label }}</span>
-                            </div>
-                        </div>
+                    <div slot="right">
+                        <slot name="header-right" v-bind:isLoading="isLoading"></slot>
+                    </div>
+                </component>
+            </slot>
+        </header>
+        <div class="scheduler-outer-pane-container">
+            <div class="scheduler-outer-left-pane" 
+                v-if="config.rowLabels.enabled" 
+                :style="outerLeftPaneStyles"
+            >
+                <div ref="rowLabelColumnHeaderPane" class="scheduler-pane scheduler-row-label-column-header-pane">
+                    <component
+                        :is="config.components.cells.rowLabels.header"
+                        :label="config.rowLabels.columnLabel"
+                        :height="cellHeaderHeight + 'px'"
+                    />
+                </div>
+                <div 
+                    ref="rowLabelColumnBodyPane" 
+                    class="scheduler-pane scheduler-row-label-column-body-pane" 
+                    :style="{ height: dataPaneHeight + 'px' }"
+                >
+                    <div v-for="row in data" :style="{ height: config.rowHeight + 'px' }">
+                        <component
+                            :is="config.components.cells.rowLabels.body"
+                            :config="config"
+                            :row="row"
+                        />
                     </div>
                 </div>
-                <div>
-                    <div ref="cellHeaderPane" class="pane" :style="{ width: (containerWidth - rowLabelPaneWidth) + 'px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)' }">
-                        <div class="card-board-cell-header">
-                            <div v-if="config.components.cells.header" class="card-board-column-headers row" :style="rowColumnCss">
-                                <div v-for="(column, index) in columns" :index="index" class="col">
-                                    <component :is="config.components.cells.header" :data="column"></component>
-                                </div>
-                            </div>
-                        </div>
+            </div>
+            <div class="scheduler-outer-right-pane">
+                <div 
+                    ref="columnHeaderPane" 
+                    class="scheduler-pane scheduler-column-header-pane" 
+                    :style="{ width: dataPaneWidth + 'px' }"
+                >
+                    <div v-if="config.components.cells.header" class="scheduler-row scheduler-column-header-row" :style="rowColumnCss">
+                        <component 
+                            :is="config.components.cells.header" 
+                            :data="column"
+                            v-for="(column, index) in columns" 
+                            :index="index"
+                        />
                     </div>
-                    <div ref="innerPane" class="pane" :style="{ width: (containerWidth - rowLabelPaneWidth) + 'px', height: dataPaneHeight + 'px' }">
-                        <div class="card-board-inner">
-                            <div class="grid-layout">
-                                <component 
-                                    :is="config.components.grid" 
-                                    :columns="columns"
-                                    :num-rows="rows.length"
-                                    :row-height="config.rowHeight"
-                                    :offset-top="cellHeaderHeight + layoutHeaderHeight"
-                                    :config="config"
-                                ></component>
-                            </div>
-                            <div class="data-layout">
-                                <slot name="data-layout-start" />
-                                <component
-                                    :is="config.components.row"
-                                    v-for="(row, i) in rows" 
-                                    :key="i" 
-                                    class="row" 
-                                    :style="rowColumnCss"
-                                    :columns="row"  
-                                    :config="config"
-                                />
-                                <slot 
-                                    name="data-layout-end" 
-                                    v-bind:isLoading="isLoading" 
-                                    v-bind:hasResults="hasResults"
-                                />
-                            </div>
+                </div>
+                <div 
+                    ref="innerPane" 
+                    class="scheduler-pane scheduler-inner-pane" 
+                    :style="{ width: dataPaneWidth + 'px', height: dataPaneHeight + 'px' }"
+                >
+                    <div class="scheduler-layout-container">
+                        <div class="scheduler-grid-layout">
+                            <component 
+                                :is="config.components.grid" 
+                                :columns="columns"
+                                :num-rows="rows.length"
+                                :row-height="config.rowHeight"
+                                :offset-top="cellHeaderHeight + layoutHeaderHeight"
+                                :config="config"
+                            ></component>
+                        </div>
+                        <div class="scheduler-data-layout">
+                            <slot name="data-layout-start" />
+                            <component
+                                :is="config.components.row"
+                                v-for="(row, i) in rows" 
+                                :key="i" 
+                                class="scheduler-row" 
+                                :style="rowColumnCss"
+                                :columns="row"  
+                                :config="config"
+                            />
+                            <slot 
+                                name="data-layout-end" 
+                                :isLoading="isLoading" 
+                                :hasResults="hasResults"
+                            />
                         </div>
                     </div>
                 </div>
@@ -112,7 +133,7 @@
             this.detectProportions()
 
             this.wireScrollWatchers()
-            
+
             this.wireResizeWatchers();
         },
         updated() {
@@ -137,23 +158,23 @@
                     this.containerHeight = this.$el.clientHeight
                     this.containerWidth = this.$el.clientWidth
 
-                    let firstHeaderColumn = this.$el.querySelector('.card-board-header-column')
+                    let firstHeaderColumn = this.$el.querySelector('.scheduler-column-header')
                     this.cellHeaderHeight = firstHeaderColumn.clientHeight
                     this.cellHeaderInnerHeight = firstHeaderColumn.offsetHeight
 
                     this.layoutHeaderHeight = this.$refs.layoutHeader.clientHeight
 
-                    if (this.$refs.rowLabelPane) {
-                        this.rowLabelPaneWidth = this.$refs.rowLabelPane.offsetWidth
+                    if (this.$refs.rowLabelColumnBodyPane) {
+                        this.rowLabelPaneWidth = this.$refs.rowLabelColumnBodyPane.offsetWidth
                     }
                 }
             },
             wireScrollWatchers() {
                 this.$refs.innerPane.onscroll = (e) => {
-                    this.$refs.cellHeaderPane.scrollLeft = this.$refs.innerPane.scrollLeft
+                    this.$refs.columnHeaderPane.scrollLeft = this.$refs.innerPane.scrollLeft
 
-                     if (this.$refs.rowLabelPane) {
-                        this.$refs.rowLabelPane.scrollTop = this.$refs.innerPane.scrollTop
+                     if (this.$refs.rowLabelColumnBodyPane) {
+                        this.$refs.rowLabelColumnBodyPane.scrollTop = this.$refs.innerPane.scrollTop
                     }
                 }
             },
@@ -207,6 +228,14 @@
             }
         },
         computed: {
+            outerLeftPaneStyles() {
+                return { 
+                    flex: '0 0 ' + this.config.rowLabels.columnWidth + 'px' 
+                }
+            },
+            dataPaneWidth() {
+                return this.containerWidth - this.rowLabelPaneWidth
+            },
             dataPaneHeight() {
                 return this.containerHeight - 
                     this.cellHeaderInnerHeight - 
@@ -219,6 +248,14 @@
                 let classes = [this.config.containerClassName]
 
                 classes.push(this.hasRows ? ' has-rows' : ' is-empty')
+
+                if (this.config.gridLines.rows) {
+                    classes.push('scheduler-row-grid-lines')
+                }
+
+                if (this.config.gridLines.columns) {
+                    classes.push('scheduler-column-grid-lines')
+                }
 
                 return classes
             },
@@ -259,80 +296,243 @@
 </script>
 
 <style lang="scss">
-.pane { overflow:auto; }
-    .card-board-container {
-        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+    .scheduler-container {
+        font-family: -apple-system, 
+                     BlinkMacSystemFont, 
+                     Segoe UI, 
+                     Roboto, 
+                     Helvetica, 
+                     Arial, 
+                     sans-serif;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
         position: relative;
-        /*min-height: 100%;*/ width: 100%;
 
-        .card-board-cell-header {
-            /*position: absolute; 
-            top:0; left: 0;
-            z-index: 2;*/
-            background: rgba(255,255,255,0.95);
-            min-width: 100%;
-        }
-
-        .card-board-inner { 
-            position: relative; 
-            min-height: 100%; 
-        }
-
-        .col { overflow: hidden; }
-    
-        .row {
-            display: grid;
-        }
-        .col, .row {
+        .scheduler-pane { overflow:auto; }
+        .scheduler-col { overflow: hidden; }
+        .scheduler-row { display: grid; }
+        .scheduler-col, .scheduler-row {
             margin: 0;
             padding: 0;
         }
 
-        .grid-layout {
-            position: absolute; 
-            top: 0; left: 0; bottom: 0;
-            min-width: 100%; min-height: 100%;
-            overflow-y: hidden;
+        .scheduler-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e5e5;
+            max-height: 80px; color: #757575;
 
-            & > div > .row > .col {
-                border-bottom: 1px solid #e5e5e5;
+            .scheduler-header-left,
+            .scheduler-header-center,
+            .scheduler-header-right {
+                flex: 1;
+            }
+
+            .scheduler-header-right {
+                text-align: right;
+            }
+
+            .scheduler-header-center {
+                text-align: center;
+
+                .scheduler-header-range {
+                    display: inline-block; 
+                    font-size: 22px; width: 250px;
+                }
+
+                button {
+                    display: inline-block;
+                    background: none;
+                    border: none;
+                    outline: none;
+
+                    &:after {
+                        border-left: 2px solid #ccc;
+                        border-top: 2px solid #ccc;
+                        width: 10px;
+                        height: 10px;
+                        display: block;
+                        content: " ";
+                        cursor: pointer;
+                    }
+
+                    &:hover:after {
+                        border-left: 2px solid #666;
+                        border-top: 2px solid #666;
+                    }
+
+                    &.prev:after { transform: rotate(-45deg); }
+                    &.next:after { transform: rotate(135deg); }
+                }
             }
         }
 
-        &.is-empty .grid-layout > .row > .col { border-bottom: none; }
+        .scheduler-outer-pane-container {
+            display: flex;
 
-        .card-board-layout-header {
-            /*position: absolute; 
-            width: 100%; z-index: 101;*/
-            background: rgba(255, 255, 255, 0.95);
-        }
+            .scheduler-column-header-pane,
+            .scheduler-row-label-column-header-pane {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            }
 
-        .data-layout {
-            z-index: 1; 
-            position: relative;
-            //padding-bottom: 1.5rem;
-        }
-    }
+            .scheduler-row-label-column-header-cell,
+            .scheduler-column-header {
+                border-bottom: 3px solid #e5e5e5; 
+                border-right: 1px solid #e5e5e5; 
+            }
 
-    .card-board-scheduler-container {
+            .scheduler-outer-left-pane {
+                .scheduler-row-label-column-header-pane {
+                    .scheduler-row-label-column-header-cell {
+                        display: flex;
+                        align-items: center;
+                        border-right: 3px solid #e5e5e5; 
 
-        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
-        display: flex;
-        flex-direction: column;
-        background: #fff;
-        //overflow: auto;
-        position: relative;
-
-        & > div { flex: 1; }
-
-        .card-board-container {
-            .grid-layout {
-                & > .row > .col {
-                    border-bottom: solid 1px rgb(229,229,229);
-                    border-right: solid 1px rgb(229,229,229);
-                    border-left: none;
-                    border-top: none;
+                        span {
+                            color: #757575; 
+                            font-weight: 500; 
+                            padding: 0 1rem;
+                        }
+                    }
                 }
+
+                .scheduler-row-label-column-body-pane {
+                    overflow: hidden; 
+                    border-right: 3px solid #e5e5e5;
+                    transform: translateY(-1px);
+
+                    .scheduler-row-label {
+                        border-bottom: 1px dashed #e5e5e5; 
+                        height: 100%; 
+                        display: flex; 
+                        align-items: center;
+
+                        .scheduler-row-label-text-container {
+                            margin-left: 1rem;
+                        }
+
+                        .scheduler-row-label-image {
+                            margin: 1rem 0 1rem 1rem;
+                            width: 48px; height: auto;
+                            border-radius: 50%;
+                        }
+
+                        .scheduler-row-label-sub-text {
+                            font-size: .8rem; 
+                            color: #999;
+                        }
+                    }
+                }
+            }
+
+            .scheduler-outer-right-pane {
+                .scheduler-column-header-pane {
+                    overflow: hidden;
+
+                    .scheduler-column-header-row {
+                        .scheduler-column-header {
+                            padding: .8rem;
+
+                            &.is-today {
+                                .scheduler-column-header-day-name,
+                                .scheduler-column-header-day-number {
+                                    color: #4285f4 !important;
+                                }
+
+                                border-bottom: 3px solid #4285f4;
+                            }
+                        }
+
+                        .scheduler-column-header-day-name,
+                        .scheduler-column-header-day-number {
+                            color: #757575;
+                            font-weight: 500;
+                            display: block;
+                            line-height: normal;
+                        }
+
+                        .scheduler-column-header-day-number {
+                            font-size: 35px;
+                            line-height: normal;
+                        }
+                    }
+                }
+
+                .scheduler-inner-pane {
+                    position: relative;
+                
+                    .scheduler-layout-container {
+                        position: relative; 
+                        min-height: 100%;
+
+                        .scheduler-grid-layout {
+                            position: absolute; 
+                            top: 0; left: 0; bottom: 0;
+                            min-width: 100%; min-height: 100%;
+                            overflow-y: hidden;
+
+                            .scheduler-grid { 
+                                height: 100%; 
+                                .is-today {
+                                    background: #f8f8f8;
+                                }
+                            }
+
+                            & > div > .scheduler-row > .scheduler-col {
+                                border-bottom: 1px solid #e5e5e5;
+                            }
+
+                            & > .scheduler-row > .scheduler-col {
+                                border-bottom: solid 1px rgb(229,229,229);
+                                border-left: none;
+                                border-top: none;
+                            }
+                        }
+
+                        .scheduler-data-layout {
+                            z-index: 1; 
+                            position: relative;
+
+                            .scheduler-item {
+                                color: white; 
+                                padding: 1rem; 
+                                margin: 1rem;
+                                overflow: hidden;
+                                word-wrap: break-word;
+                                border-radius: 4px;
+
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+
+                                &.scheduler-is-continuation { 
+                                    margin-left: 0; 
+                                    border-top-left-radius: 0;
+                                    border-bottom-left-radius: 0;
+                                }
+                                &.scheduler-is-curtailed { 
+                                    margin-right: 0;
+                                    border-top-right-radius: 0;
+                                    border-bottom-right-radius: 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        &.scheduler-row-grid-lines { 
+            .scheduler-grid-row {
+                border-bottom: 1px dashed #e5e5e5;
+            } 
+        }
+
+        &.scheduler-column-grid-lines {
+            .scheduler-grid > .scheduler-col {
+                border-right: solid 1px rgb(229,229,229);
             }
         }
     }

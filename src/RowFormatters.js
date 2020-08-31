@@ -108,8 +108,6 @@ class StandardRowFormatter
 class GroupedRowFormatter extends StandardRowFormatter
 {
     format(data) {
-        console.log('sds')
-
         let r = data.map(r => {
             let row = this.createRow()
 
@@ -121,8 +119,6 @@ class GroupedRowFormatter extends StandardRowFormatter
 
             return row
         });
-
-        console.log(r)
 
         return r
     }

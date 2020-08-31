@@ -1,17 +1,22 @@
-import { StandardRowFormatter, Header, Grid, Row, Item, ColumnHeader } from './index.js'
+import { StandardRowFormatter, Header, Grid, Row, Item, ColumnHeader, RowLabelColumnHeader, RowLabel } from './index.js'
 
 let DefaultConfig = {
     debug: false,
-    containerClassName: 'card-board-container',
+    containerClassName: 'scheduler-container',
     daysToShow: 7,
     daysToScroll: 7,
     columnWidth: '1fr',
     rowHeight: 83,
-    dataSourceGroups: {
+    rowLabels: {
         enabled: false,
-        rowLabel: 'label',
-        rowKey: 'id',
-        headerLabel: '',
+        columnLabel: '',
+        columnWidth: 225,
+        keys: { 
+            id: 'id',
+            label: 'label',
+            sublabel: 'sublabel',
+            image: 'image',
+        },
     },
     gridLines: {
         columns: true,
@@ -25,6 +30,10 @@ let DefaultConfig = {
         cells: {
             body: Item,
             header: ColumnHeader,
+            rowLabels: {
+                header: RowLabelColumnHeader,
+                body: RowLabel
+            }
         }
     }
 }
