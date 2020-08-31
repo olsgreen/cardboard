@@ -105,6 +105,29 @@ class StandardRowFormatter
     }
 }
 
+class GroupedRowFormatter extends StandardRowFormatter
+{
+    format(data) {
+        console.log('sds')
+
+        let r = data.map(r => {
+            let row = this.createRow()
+
+            let items = this.prepare(r.entries)
+
+            for (let i in items) {
+                row[items[i]._column] = items[i]
+            }
+
+            return row
+        });
+
+        console.log(r)
+
+        return r
+    }
+}
+
 
 class MasonryRowFormatter extends StandardRowFormatter
 {
@@ -191,4 +214,4 @@ class MasonryRowFormatter extends StandardRowFormatter
     }
 }
 
-export { StandardRowFormatter, MasonryRowFormatter }
+export { StandardRowFormatter, MasonryRowFormatter, GroupedRowFormatter }

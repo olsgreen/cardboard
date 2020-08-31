@@ -9,7 +9,7 @@
     .card-board-header-column {
         padding: .8rem;
         border-right: solid 1px #e5e5e5;
-        border-bottom: 3px solid #fff;
+        border-bottom: solid 3px #e5e5e5;
 
         &.is-today {
             .card-board-scheduler-header-day-name,

@@ -10,14 +10,25 @@
     .card-board-body-cell {
         color: white; 
         padding: 1rem; 
-        margin-top: 1rem; 
-        margin-left: 1rem; 
-        margin-right: 1rem; 
+        margin: 1rem;
         overflow: hidden;
         word-wrap: break-word;
+        border-radius: 4px;
 
-        &.is-continuation { margin-left: 0; }
-        &.is-curtailed { margin-right: 0; }
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.is-continuation { 
+            margin-left: 0; 
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        &.is-curtailed { 
+            margin-right: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
     }
 </style>
 

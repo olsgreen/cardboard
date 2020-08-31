@@ -7,17 +7,22 @@
 </template>
 
 <script>
-    import { Scheduler, MasonryRowFormatter } from '../src/index.js'
-    import { FixedDataGenerator, RandomDataGenerator } from './DataGenerator.js'
+    import { Scheduler, GroupedRowFormatter } from '../src/index.js'
+    import { FixedDataGenerator, RandomDataGenerator, GroupedDataGenerator } from './DataGenerator.js'
 
     const config = {
-        rowFormatter: MasonryRowFormatter,
-        columnWidth: '200px',
-        daysToShow: 14,
+        rowFormatter: GroupedRowFormatter,
+        //columnWidth: '250px',
+        dataSourceGroups: {
+            enabled: true,
+            rowLabel: 'label',
+            rowKey: 'id',
+            headerLabel: 'Team Members',
+        },
     }
 
     export default {
-        mixins: [RandomDataGenerator],
+        mixins: [GroupedDataGenerator],
         components: { Scheduler },
         data() {
             return {

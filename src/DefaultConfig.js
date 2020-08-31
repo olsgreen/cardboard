@@ -6,6 +6,18 @@ let DefaultConfig = {
     daysToShow: 7,
     daysToScroll: 7,
     columnWidth: '1fr',
+    rowHeight: 83,
+    dataSourceGroups: {
+        enabled: false,
+        rowLabel: 'label',
+        rowKey: 'id',
+        headerLabel: '',
+    },
+    gridLines: {
+        columns: true,
+        rows: true,
+    },
+    // Remove me
     stickyHeader: {
         enabled: true,
         offsetTop: 0

@@ -86,4 +86,73 @@ const FixedDataGenerator = {
     }    
 }
 
-export { RandomDataGenerator, FixedDataGenerator }
+const GroupedDataGenerator = {
+    computed: {
+        data() {
+            let seed1, seed2, coolor, to, from;
+
+            let rows = [
+                {
+                    id: 1,
+                    label: 'Jeanne-France',
+                    image: 'assets/headshots/1.png',
+                    entries: []
+                },{
+                    id: 2,
+                    label: 'Jean-Marie',
+                    image: 'assets/headshots/2.png',
+                    entries: []
+                },{
+                    id: 3,
+                    label: 'Oliver',
+                    image: 'assets/headshots/4.png',
+                    entries: []
+                },{
+                    id: 4,
+                    label: 'Laetitia',
+                    image: 'assets/headshots/3.png',
+                    entries: []
+                },{
+                    id: 5,
+                    label: 'Cedric',
+                    image: 'assets/headshots/6.png',
+                    entries: []
+                },{
+                    id: 6,
+                    label: 'Vanessa',
+                    image: 'assets/headshots/5.png',
+                    entries: []
+                },
+            ]
+
+            return rows.map(row => {
+                to = new Moment().subtract('14', 'days').hour(0).minute(0).seconds(0)
+                coolor = coolors[_.random(0, coolors.length - 1)]
+
+                for(let i = 0; i <= 3; i++) {
+                    from = to.clone().add(1, 'days')
+                    seed2 = _.random(0,3)
+
+                    if (seed2 > 0) {
+                        to = from.clone().add(seed2, 'days')
+                    } else {
+                        to = from.clone();
+                    }
+                    
+                    to = to.hour(23).minute(59).seconds(59)
+
+                    row.entries.push({
+                        content: 'Event ' + i,
+                        color: coolor,
+                        from,
+                        to,
+                    })
+                }
+
+                return row
+            })
+        }
+    }        
+}
+
+export { RandomDataGenerator, FixedDataGenerator, GroupedDataGenerator }

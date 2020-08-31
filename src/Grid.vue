@@ -1,6 +1,8 @@
 <template>
-    <div class="card-board-grid row" :style="'height: 100%;' + rowCss">
-        <div v-for="(column, index) in columns" :index="index" :class="'col' + dateClassPrefixes(column.start)"></div>
+    <div class="card-board-grid row" :style="[{ height: '100%', /*paddingTop: offsetTop + 'px'*/ }, rowColumnCss]">
+        <div v-for="(column, index) in columns" :index="index" :class="'col' + dateClassPrefixes(column.start)">
+            <div v-for="row in numRows" :style="{ height: (rowHeight - 1) + 'px', borderBottom: '1px dashed #e5e5e5' }"></div>
+        </div>
     </div>
 </template>
 
@@ -19,6 +21,18 @@
     export default {
         mixins: [GeneratesColumnCss,DateRelatedColumnClassNames],
         props: {
+            numRows: {
+                type: Number,
+                required: true,
+            },
+            rowHeight: {
+                type: Number,
+                required: true,
+            },
+            offsetTop: {
+                type: Number,
+                required: true,
+            },
             columns: {
                 type: Array,
                 required: true,
