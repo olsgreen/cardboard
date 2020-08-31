@@ -1,7 +1,7 @@
 <template>
     <div class="card-board-scheduler-container">
         <div :class="containerClasses">
-            <div class="card-board-layout-header">
+            <div ref="layoutHeader" class="card-board-layout-header">
                 <slot name="layout-header" v-if="config.components.header">
                     <component 
                         :is="config.components.header"
@@ -109,12 +109,13 @@
             this.getData()
         },
         mounted() {
-            this.detectAndSetHeaderHeights()
+            this.detectProportions()
 
-            this.stickyHeader()
+            this.wireScrollWatchers()
+            this.wireResizeWatchers();
         },
         updated() {
-            this.detectAndSetHeaderHeights()
+            this.detectProportions()
         },
         data() {
             return {
@@ -130,67 +131,35 @@
             }
         },
         methods: {
-            detectAndSetHeaderHeights() {
+            detectProportions() {
                 if (this.$el) {
                     this.containerHeight = this.$el.clientHeight
                     this.containerWidth = this.$el.clientWidth
-                    this.cellHeaderHeight = this.$el.querySelector('.card-board-header-column').clientHeight
-                    this.cellHeaderInnerHeight = this.$el.querySelector('.card-board-header-column').offsetHeight
-                    this.layoutHeaderHeight = this.$el.querySelector('.card-board-layout-header').clientHeight
 
-                    // Detect the label pane width.
+                    let firstHeaderColumn = this.$el.querySelector('.card-board-header-column')
+                    this.cellHeaderHeight = firstHeaderColumn.clientHeight
+                    this.cellHeaderInnerHeight = firstHeaderColumn.offsetHeight
+
+                    this.layoutHeaderHeight = this.$refs.layoutHeader.clientHeight
+
                     if (this.$refs.rowLabelPane) {
                         this.rowLabelPaneWidth = this.$refs.rowLabelPane.offsetWidth
                     }
                 }
             },
-            stickyHeader() {
-                var layoutHeader = this.$el.querySelector('.card-board-layout-header');
-                var cellHeader = this.$el.querySelector('.card-board-cell-header');
-                var offsetTop = (this.config.stickyHeader.offsetTop) ?
-                    this.config.stickyHeader.offsetTop :
-                    0;
-
+            wireScrollWatchers() {
                 this.$refs.innerPane.onscroll = (e) => {
-                    //console.log(this.$refs.innerPane.scrollTop, this.$refs.innerPane.scrollLeft)
                     this.$refs.cellHeaderPane.scrollLeft = this.$refs.innerPane.scrollLeft
 
                      if (this.$refs.rowLabelPane) {
                         this.$refs.rowLabelPane.scrollTop = this.$refs.innerPane.scrollTop
                     }
                 }
-
+            },
+            wireResizeWatchers() {
                 window.onresize = (e) => {
-                    this.detectAndSetHeaderHeights()
+                    this.detectProportions()
                 }
-
-                /*this.$el.onscroll = (e) => {
-                    //window.requestAnimationFrame(() => {
-                        //layoutHeader.style.left = this.$el.scrollLeft + 'px';
-
-                        if (!this.config.stickyHeader.enabled) {
-                            return
-                        }
-
-                        /*cellHeader.style.top = offsetTop  > 0 ?
-                                offsetTop + 'px' : 
-                                (this.$el.scrollTop - 1) + 'px';
-                        
-                        layoutHeader.style.top = offsetTop  > 0 ?
-                                offsetTop + 'px' : 
-                                this.$el.scrollTop + 'px';*/
-
-                        /*cellHeader.style.transform = offsetTop  > 0 ?
-                                offsetTop + 'px' : 
-                                'translateY(' + (this.$el.scrollTop - 1) + 'px)';
-                        
-                        layoutHeader.style.transform = offsetTop  > 0 ?
-                                offsetTop + 'px' : 
-                                'translateY(' + this.$el.scrollTop + 'px)';
-
-                        console.log(this.$el.scrollTop)
-                    //})
-                }*/
             },
             next() {
                 this.gotoDate(new Moment(this.from).add(this.config.daysToScroll, 'days'))
@@ -255,9 +224,11 @@
                 return {}
             },
             containerClasses() {
-                return this.config.containerClassName + 
-                    (this.hasRows ? ' has-rows' : ' is-empty') +
-                    (this.config.stickyHeader.enabled ? ' has-sticky-header' : '')
+                let classes = [this.config.containerClassName]
+
+                classes.push(this.hasRows ? ' has-rows' : ' is-empty')
+
+                return classes
             },
             rowClasses() {
                 let list = ['row']

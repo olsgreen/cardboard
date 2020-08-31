@@ -17,11 +17,6 @@ let DefaultConfig = {
         columns: true,
         rows: true,
     },
-    // Remove me
-    stickyHeader: {
-        enabled: true,
-        offsetTop: 0
-    },
     rowFormatter: StandardRowFormatter,
     components:{
         header: Header,
