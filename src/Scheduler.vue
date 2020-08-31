@@ -34,7 +34,7 @@
                 </div>
                 <div>
                     <div ref="cellHeaderPane" class="pane" :style="{ width: (containerWidth - rowLabelPaneWidth) + 'px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)' }">
-                        <div class="card-board-cell-header" :style="cellHeaderStyles">
+                        <div class="card-board-cell-header">
                             <div v-if="config.components.cells.header" class="card-board-column-headers row" :style="rowColumnCss">
                                 <div v-for="(column, index) in columns" :index="index" class="col">
                                     <component :is="config.components.cells.header" :data="column"></component>
@@ -44,7 +44,7 @@
                     </div>
                     <div ref="innerPane" class="pane" :style="{ width: (containerWidth - rowLabelPaneWidth) + 'px', height: dataPaneHeight + 'px' }">
                         <div class="card-board-inner">
-                            <div class="grid-layout" :style="gridLayoutStyles">
+                            <div class="grid-layout">
                                 <component 
                                     :is="config.components.grid" 
                                     :columns="columns"
@@ -54,13 +54,13 @@
                                     :config="config"
                                 ></component>
                             </div>
-                            <div class="data-layout" :style="dataLayoutStyles">
+                            <div class="data-layout">
                                 <slot name="data-layout-start" />
                                 <component
                                     :is="config.components.row"
                                     v-for="(row, i) in rows" 
                                     :key="i" 
-                                    :class="rowClasses" 
+                                    class="row" 
                                     :style="rowColumnCss"
                                     :columns="row"  
                                     :config="config"
@@ -112,6 +112,7 @@
             this.detectProportions()
 
             this.wireScrollWatchers()
+            
             this.wireResizeWatchers();
         },
         updated() {
@@ -207,21 +208,12 @@
         },
         computed: {
             dataPaneHeight() {
-                return this.containerHeight - this.cellHeaderInnerHeight - this.layoutHeaderHeight
+                return this.containerHeight - 
+                    this.cellHeaderInnerHeight - 
+                    this.layoutHeaderHeight
             },
             hasRows() {
                 return this.rows.length > 0
-            },
-            dataLayoutStyles() {
-                //return 'padding-top: ' + (this.cellHeaderHeight + this.layoutHeaderHeight) + 'px;'
-                return {}
-            },
-            gridLayoutStyles() {
-                //return 'padding-top: ' + this.layoutHeaderHeight + 'px;'
-            },
-            cellHeaderStyles() {
-                //return 'padding-top: ' + this.layoutHeaderHeight + 'px;'
-                return {}
             },
             containerClasses() {
                 let classes = [this.config.containerClassName]
@@ -229,11 +221,6 @@
                 classes.push(this.hasRows ? ' has-rows' : ' is-empty')
 
                 return classes
-            },
-            rowClasses() {
-                let list = ['row']
-
-                return list
             },
             rows() {
                 let formatter = new this.config.rowFormatter(this)
