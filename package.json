@@ -1,6 +1,6 @@
 {
-  "name": "cardboard",
-  "version": "1.0.0",
+  "name": "cardboard-vue",
+  "version": "2.0.0-alpha",
   "description": "Flexible kanban meets agenda component for Vue.",
   "main": "src/index.js",
   "scripts": {
