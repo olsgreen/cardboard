@@ -56,7 +56,7 @@
                             :is="config.components.cells.header" 
                             :data="column"
                             v-for="(column, index) in columns" 
-                            :index="index"
+                            :key="index"
                         />
                     </div>
                 </div>
