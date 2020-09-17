@@ -102,7 +102,8 @@
 
 <script>
     import { merge } from 'lodash'
-    import { GeneratesColumnCss, DefaultConfig } from './index.js'
+    import GeneratesColumnCss from './GeneratesColumnCss.js'
+    import DefaultConfig from './DefaultConfig.js'
     import Moment from 'moment'
 
     export default {

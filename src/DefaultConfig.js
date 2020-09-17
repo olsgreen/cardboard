@@ -1,4 +1,11 @@
-import { StandardRowFormatter, Header, Grid, Row, Item, ColumnHeader, RowLabelColumnHeader, RowLabel } from './index.js'
+import { StandardRowFormatter } from './RowFormatters.js'
+import Header from './Header.vue'
+import Grid from './Grid.vue'
+import Row from './Row.vue'
+import Item from './Item.vue'
+import ColumnHeader from './ColumnHeader.vue'
+import RowLabelColumnHeader from './RowLabelColumnHeader.vue'
+import RowLabel from './RowLabel.vue'
 
 let DefaultConfig = {
     debug: false,
@@ -20,7 +27,7 @@ let DefaultConfig = {
     },
     gridLines: {
         columns: true,
-        rows: true,
+        rows: false,
     },
     rowFormatter: StandardRowFormatter,
     components:{
