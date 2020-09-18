@@ -12,6 +12,7 @@ let DefaultConfig = {
     containerClassName: 'scheduler-container',
     daysToShow: 7,
     daysToScroll: 7,
+    columnMinWidth: '0px',
     columnWidth: '1fr',
     rowHeight: 83,
     rowLabels: {
