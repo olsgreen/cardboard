@@ -1,5 +1,5 @@
 <template>
-    <div :class="'scheduler-col scheduler-column-header ' + dateClassPrefixes(data.start)">
+    <div @click="e => $parent.$emit('day-selected', e, data)" :class="'scheduler-col scheduler-column-header ' + dateClassPrefixes(data.start)">
         <span class="scheduler-column-header-day-name">{{ data.start | formatDay }}</span>
         <span class="scheduler-column-header-day-number">{{ data.start | formatDayOfMonth }}</span>
     </div>
