@@ -77,7 +77,7 @@ class StandardRowFormatter
             item._display_state = 'in-view'
             if (item._column === 0 && Moment(item.from).isBefore(this.scheduler.from)) {
                 item._display_state = 'continuation'
-            } else if (item._column === (this.scheduler.columns.length - 1) && item._to.isAfter(this.scheduler.to)) {
+            } else if (item._to.isAfter(this.scheduler.to)) {
                 item._display_state = 'curtailed'
             } 
 
