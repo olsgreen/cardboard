@@ -331,24 +331,20 @@
                 flex: 1;
             }
 
-            .scheduler-header-center {
-                display: flex;
-            }
-
             .scheduler-header-right {
                 text-align: right;
             }
 
             .scheduler-header-center {
+                display: flex;
                 text-align: center;
 
                 .scheduler-header-range {
-                    display: inline-block; 
-                    font-size: 22px; width: 250px;
+                    flex: 1;
+                    font-size: 22px;
                 }
 
                 button {
-                    display: inline-block;
                     background: none;
                     border: none;
                     outline: none;
