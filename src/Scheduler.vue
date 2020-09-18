@@ -331,6 +331,10 @@
                 flex: 1;
             }
 
+            .scheduler-header-center {
+                display: flex;
+            }
+
             .scheduler-header-right {
                 text-align: right;
             }
