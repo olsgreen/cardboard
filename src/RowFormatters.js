@@ -38,7 +38,7 @@ class StandardRowFormatter
 
     sortComparator(a, b) {
         if (this.scheduler.config.sortComparator) {
-            return this.scheduler.config.sortComparator.apply(this, [item])
+            return this.scheduler.config.sortComparator.apply(this, [a,b])
         }
 
         a = a._span ? a._span : 1
