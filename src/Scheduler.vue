@@ -205,6 +205,7 @@
             getData() {
                 this.isLoading = true
                 this.setData([]);
+                this.$emit('loading')
 
                 return new Promise((resolve, reject) => {
                     
@@ -213,6 +214,7 @@
                     if (typeof promise === 'object' && promise.constructor.name === 'Array') {
                         this.setData(promise)
                         this.isLoading = false
+                        this.$emit('loaded')
                         resolve()
                         return;
                     } 
@@ -220,6 +222,7 @@
                     promise.then(data => {
                         this.setData(data);
                         this.isLoading = false
+                        this.$emit('loaded')
                         resolve(data);
                     }).catch(e => { 
                         this.isLoading = false
