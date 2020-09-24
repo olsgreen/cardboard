@@ -76,7 +76,7 @@
                                 :config="config"
                             ></component>
                         </div>
-                        <div class="scheduler-data-layout">
+                        <div ref="dataLayout" class="scheduler-data-layout">
                             <slot name="data-layout-start" />
                             <component
                                 :is="config.components.row"
