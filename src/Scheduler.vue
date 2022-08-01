@@ -272,7 +272,7 @@
                 return this.data.length > 0
             },
             to() {
-                return new Moment(this.from).add(this.config.daysToShow, 'days');
+                return new Moment(this.from).add(this.config.daysToShow, 'days').subtract(1, 'second')
             },
             columns() {
                 let columns = [];
